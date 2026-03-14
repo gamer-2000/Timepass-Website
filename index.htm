@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click the Ghost! - Time Pass</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #e94560;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+        }
+        .game-container {
+            position: relative;
+            width: 90vw;
+            max-width: 600px;
+            height: 70vh;
+            background: #16213e;
+            border: 4px solid #0f3460;
+            border-radius: 20px;
+            cursor: crosshair;
+        }
+        #ghost {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            font-size: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        #ghost:active { transform: scale(0.8); }
+        .stats {
+            display: flex;
+            gap: 40px;
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        button {
+            padding: 10px 25px;
+            font-size: 18px;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover { background: #ff5e78; }
+    </style>
+</head>
+<body>
+
+    <h1>Click the Ghost!</h1>
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Time: <span id="timer">30</span>s</div>
+    </div>
+
+    <div class="game-container" id="area">
+        <div id="ghost">👻</div>
+    </div>
+
+    <button onclick="startGame()" id="startBtn">Start Game</button>
+
+    <script>
+        const ghost = document.getElementById('ghost');
+        const area = document.getElementById('area');
+        const scoreDisplay = document.getElementById('score');
+        const timerDisplay = document.getElementById('timer');
+        const startBtn = document.getElementById('startBtn');
+
+        let score = 0;
+        let timeLeft = 30;
+        let gameActive = false;
+        let moveInterval;
+
+        // Hide ghost until start
+        ghost.style.display = 'none';
+
+        function moveGhost() {
+            const maxX = area.clientWidth - 60;
+            const maxY = area.clientHeight - 60;
+            
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+            
+            ghost.style.left = randomX + 'px';
+            ghost.style.top = randomY + 'px';
+        }
+
+        ghost.addEventListener('mousedown', () => {
+            if (gameActive) {
+                score++;
+                scoreDisplay.innerText = score;
+                moveGhost(); // Move immediately when clicked
+            }
+        });
+
+        function startGame() {
+            score = 0;
+            timeLeft = 30;
+            gameActive = true;
+            scoreDisplay.innerText = score;
+            timerDisplay.innerText = timeLeft;
+            startBtn.style.display = 'none';
+            ghost.style.display = 'flex';
+            
+            moveGhost();
+            
+            // Move ghost every 800ms
+            moveInterval = setInterval(moveGhost, 800);
+
+            // Timer countdown
+            const countdown = setInterval(() => {
+                timeLeft--;
+                timerDisplay.innerText = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    clearInterval(moveInterval);
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            gameActive = false;
+            ghost.style.display = 'none';
+            startBtn.style.display = 'block';
+            startBtn.innerText = "Play Again";
+            alert("Time's up! You caught " + score + " ghosts!");
+        }
+    </script>
+</body>
+</html>
